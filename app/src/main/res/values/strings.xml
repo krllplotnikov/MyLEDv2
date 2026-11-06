@@ -18,11 +18,9 @@
     <string name="theme_dark">Dark</string>
     <string name="power">Power</string>
     <string name="about">About</string>
-    <string name="close">Close</string>
     <string name="about_text">MyLED controls an addressable LED strip through a Bluetooth LE controller.\n\nPick a color and brightness on the Home page, run an effect or a color music mode, and set the number of LEDs in Settings. All settings are stored on the controller and restored after power loss.</string>
     <string name="version">Version %1$s</string>
     <string name="status_disconnected">Not connected</string>
-    <string name="status_scanning">Searching…</string>
     <string name="status_connecting">Connecting…</string>
     <string name="status_connected">Connected: %1$s</string>
     <string name="devices_title">Controllers</string>
@@ -32,6 +30,4 @@
     <string name="bt_permission_needed">Bluetooth permission is required to connect to the controller</string>
     <string name="bt_disabled">Turn on Bluetooth to connect to the controller</string>
     <string name="leds_range">1 – %1$d</string>
-    <string name="leds_saved">Number of LEDs sent</string>
-    <string name="not_connected_hint">Not connected — changes will be sent after connecting</string>
 </resources>
