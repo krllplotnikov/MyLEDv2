@@ -58,7 +58,8 @@ class LedViewModel(app: Application) : AndroidViewModel(app) {
         val prev = _state.value
         update { it.copy(hue = hue, saturation = saturation, mode = LedProtocol.Mode.COLOR) }
         ensureOnAndMode(prev, LedProtocol.Mode.COLOR)
-        if (LedProtocol.hueByte(hue) != LedProtocol.hueByte(prev.hue)) send(Param.HUE, LedProtocol.hueByte(hue))
+        val hueDeg = LedProtocol.hueDegrees(hue)
+        if (hueDeg != LedProtocol.hueDegrees(prev.hue)) ble.send(LedProtocol.hue(hueDeg))
         if (saturation != prev.saturation) send(Param.SATURATION, saturation)
     }
 
@@ -137,7 +138,7 @@ class LedViewModel(app: Application) : AndroidViewModel(app) {
         ble.clearQueue()
         ble.send(LedProtocol.numLeds(s.numLeds))
         send(Param.BRIGHTNESS, s.brightness)
-        send(Param.HUE, LedProtocol.hueByte(s.hue))
+        ble.send(LedProtocol.hue(LedProtocol.hueDegrees(s.hue)))
         send(Param.SATURATION, s.saturation)
         send(Param.EFFECT, s.effect)
         send(Param.EFFECT_SPEED, LedProtocol.speedToDelay(s.effectSpeed))

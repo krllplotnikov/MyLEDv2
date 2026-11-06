@@ -15,7 +15,7 @@ data class LedState(
     val mode: Int = LedProtocol.Mode.COLOR,
     /** 0..100 */
     val brightness: Int = 100,
-    /** Градусы 0..360 (на контроллер уходит не больше 255, см. LedProtocol.hueByte). */
+    /** Градусы 0..360 (на контроллер уходит 0..359 двумя байтами). */
     val hue: Float = 0f,
     /** 0..100 */
     val saturation: Int = 100,

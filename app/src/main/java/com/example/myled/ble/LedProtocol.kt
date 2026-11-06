@@ -5,7 +5,8 @@ import java.util.UUID
 /**
  * Протокол обмена с контроллером AddressStrip_Controller (ESP32).
  *
- * Один пакет = 2 или 3 байта: [параметр, значение] или [0x00, hi, lo] для количества светодиодов.
+ * Один пакет = 2 или 3 байта: [параметр, значение] или [параметр, hi, lo] для
+ * двухбайтовых параметров (количество светодиодов и оттенок).
  * Пакет пишется в характеристику [CHARACTERISTIC_UUID] сервиса [SERVICE_UUID].
  */
 object LedProtocol {
@@ -42,22 +43,24 @@ object LedProtocol {
         const val COLOR_MUSIC = 3
     }
 
-    fun numLeds(count: Int): ByteArray {
-        val v = count.coerceIn(1, MAX_LEDS)
-        // Контроллер собирает значение как (data[1] << 8) | data[2] — big-endian.
-        return byteArrayOf(Param.NUM_LEDS.code, (v shr 8).toByte(), (v and 0xFF).toByte())
-    }
+    private val TWO_BYTE_PARAMS = setOf(Param.NUM_LEDS, Param.HUE)
+
+    /** Контроллер собирает двухбайтовое значение как (data[1] << 8) | data[2] — big-endian. */
+    private fun wordParam(param: Param, value: Int): ByteArray =
+        byteArrayOf(param.code, (value shr 8).toByte(), (value and 0xFF).toByte())
+
+    fun numLeds(count: Int): ByteArray = wordParam(Param.NUM_LEDS, count.coerceIn(1, MAX_LEDS))
+
+    /** Оттенок в градусах 0..359. */
+    fun hue(hueDegrees: Int): ByteArray = wordParam(Param.HUE, hueDegrees.coerceIn(0, 359))
 
     fun byteParam(param: Param, value: Int): ByteArray {
-        require(param != Param.NUM_LEDS) { "Use numLeds()" }
+        require(param !in TWO_BYTE_PARAMS) { "$param is a two-byte parameter" }
         return byteArrayOf(param.code, value.coerceIn(0, 255).toByte())
     }
 
-    /**
-     * Прошивка трактует оттенок как градусы (0..360), но по протоколу передаётся один байт,
-     * поэтому оттенки 256..359° недостижимы и прижимаются к 255.
-     */
-    fun hueByte(hueDegrees: Float): Int = hueDegrees.toInt().coerceIn(0, 255)
+    /** Градусы с цветового круга (0..360) → целое значение для контроллера (0..359). */
+    fun hueDegrees(hue: Float): Int = hue.toInt().mod(360)
 
     /**
      * Скорость в прошивке — задержка шага анимации в мс (меньше = быстрее).
